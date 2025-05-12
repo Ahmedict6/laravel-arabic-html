@@ -30,14 +30,28 @@ class ServiceProvider extends BaseServiceProvider
      */
     public static function convertToArabic($html, int $line_length = 100, bool $hindo = false, $forcertl = false): string
     {
-        $Arabic = new \ArPHP\I18N\Arabic();
-        $p = $Arabic->arIdentify($html);
+        try {
+            $Arabic = new \ArPHP\I18N\Arabic();
+            $p = $Arabic->arIdentify($html);
 
-        for ($i = count($p) - 1; $i >= 1; $i -= 2) {
-            $utf8ar = $Arabic->utf8Glyphs(substr($html, $p[$i - 1], $p[$i] - $p[$i - 1]), $line_length, $hindo, $forcertl);
-            $html   = substr_replace($html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
+            for ($i = count($p) - 1; $i >= 1; $i -= 2) {
+                $utf8ar = $Arabic->utf8Glyphs(substr($html, $p[$i - 1], $p[$i] - $p[$i - 1]), $line_length, $hindo, $forcertl);
+                $html   = substr_replace($html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
+            }
+
+            return $html;
+        } catch (\Exception $e) {
+            $lines = explode("\n", $html);
+            $lineCount = count($lines);
+            $htmlExcerpt = $lineCount > 10 ? implode("\n", array_slice($lines, 0, 10)) . "\n..." : $html;
+            
+            throw new \Exception(
+                "Error processing Arabic HTML: " . $e->getMessage() . 
+                "\nHTML content (first 10 lines): \n" . $html . 
+                "\nTotal lines: " . $lineCount,
+                $e->getCode(), 
+                $e
+            );
         }
-
-        return $html;
     }
 }
