@@ -33,7 +33,7 @@ class ServiceProvider extends BaseServiceProvider
         $Arabic = new \ArPHP\I18N\Arabic();
         $p = $Arabic->arIdentify($html);
 
-        for ($i = count($p) - 1; $i >= 0; $i -= 2) {
+        for ($i = count($p) - 1; $i >= 1; $i -= 2) {
             $utf8ar = $Arabic->utf8Glyphs(substr($html, $p[$i - 1], $p[$i] - $p[$i - 1]), $line_length, $hindo, $forcertl);
             $html   = substr_replace($html, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
         }
